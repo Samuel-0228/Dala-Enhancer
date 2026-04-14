@@ -1,69 +1,83 @@
 import React from "react";
-import { motion } from "framer-motion";
-import { Enhancement } from "@/App";
+import { CheckCircle2, Circle, Sparkles, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, Plus, Sparkles, Layout, UserCheck, Zap } from "lucide-react";
+import { EnhancementPlan } from "@/lib/types";
 
 interface EnhancementSystemProps {
-  enhancements: Enhancement[];
-  onApply: (id: string) => void;
-  disabled?: boolean;
+  plan: EnhancementPlan | null;
+  approvals: string[];
+  onToggle: (id: string) => void;
+  onApply: () => void;
+  disabled: boolean;
 }
 
-export const EnhancementSystem: React.FC<EnhancementSystemProps> = ({ enhancements, onApply, disabled }) => {
-  const icons: Record<string, any> = {
-    ui: Sparkles,
-    dashboard: Layout,
-    auth: UserCheck,
-    perf: Zap,
-  };
+export const EnhancementSystem: React.FC<EnhancementSystemProps> = ({
+  plan,
+  approvals,
+  onToggle,
+  onApply,
+  disabled
+}) => {
+  if (!plan) return null;
 
   return (
-    <div className="p-6 bg-slate-900 border border-white/10 rounded-2xl shadow-xl">
-      <h3 className="text-lg font-bold mb-6 flex items-center">
-        <Sparkles className="w-5 h-5 mr-2 text-indigo-400" />
-        Enhancement System
-      </h3>
+    <div className="bg-black border border-zinc-900 p-8 rounded-none space-y-10">
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-xl font-normal text-white tracking-tight">Enhancement Plan</h3>
+          <p className="text-zinc-500 text-[10px] tracking-widest mt-1 font-normal uppercase">Architectural transformation protocols</p>
+        </div>
+        <div className="text-right">
+          <div className="text-[10px] text-zinc-700 tracking-widest mb-1 font-normal uppercase">Approved</div>
+          <div className="text-xl font-normal text-white">{approvals.length} / {plan.steps.length}</div>
+        </div>
+      </div>
 
-      <div className="space-y-3">
-        {enhancements.map((e) => {
-          const Icon = icons[e.id] || Sparkles;
-          const isApplied = e.status === "applied";
-
+      <div className="space-y-4">
+        {plan.steps.map((step) => {
+          const isApproved = approvals.includes(step.id);
           return (
-            <motion.div
-              key={e.id}
-              whileHover={!disabled && !isApplied ? { x: 4 } : {}}
-              className={`p-4 rounded-xl border transition-all ${
-                isApplied 
-                  ? "bg-indigo-500/10 border-indigo-500/30" 
-                  : "bg-slate-800/50 border-white/5"
-              } ${disabled ? "opacity-50 grayscale" : ""}`}
+            <div 
+              key={step.id}
+              onClick={() => onToggle(step.id)}
+              className={`p-5 border cursor-pointer transition-all duration-300 group ${
+                isApproved ? "border-zinc-700 bg-zinc-950" : "border-zinc-900 opacity-60"
+              }`}
             >
-              <div className="flex items-start justify-between">
-                <div className="flex items-start gap-3">
-                  <div className={`mt-1 p-2 rounded-lg ${isApplied ? "bg-indigo-500 text-white" : "bg-slate-700 text-slate-400"}`}>
-                    <Icon className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <h4 className={`font-bold text-sm ${isApplied ? "text-indigo-300" : "text-white"}`}>{e.name}</h4>
-                    <p className="text-slate-500 text-xs mt-1 leading-relaxed">{e.description}</p>
-                  </div>
+              <div className="flex items-start gap-5">
+                <div className="mt-1">
+                  {isApproved ? (
+                    <CheckCircle2 className="w-4 h-4 text-white" />
+                  ) : (
+                    <Circle className="w-4 h-4 text-zinc-800" />
+                  )}
                 </div>
-                <Button
-                  size="sm"
-                  variant={isApplied ? "ghost" : "default"}
-                  disabled={disabled || isApplied}
-                  onClick={() => onApply(e.id)}
-                  className={`h-8 w-8 p-0 rounded-full ${isApplied ? "text-indigo-400" : "bg-indigo-600 hover:bg-indigo-500"}`}
-                >
-                  {isApplied ? <CheckCircle2 className="w-5 h-5" /> : <Plus className="w-4 h-4" />}
-                </Button>
+                <div className="flex-grow">
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="text-xs font-normal text-white tracking-widest">{step.name.toUpperCase()}</h4>
+                    <span className="text-[9px] tracking-[0.2em] px-2 py-0.5 border border-zinc-800 text-zinc-600 font-normal">
+                      UNIT
+                    </span>
+                  </div>
+                  <p className="text-zinc-500 text-[10px] leading-relaxed tracking-tight font-normal">{step.description}</p>
+                </div>
               </div>
-            </motion.div>
+            </div>
           );
         })}
       </div>
+
+      <Button
+        onClick={onApply}
+        disabled={disabled || approvals.length === 0}
+        className="w-full bg-white text-black hover:bg-zinc-200 h-14 rounded-none font-normal tracking-widest text-xs shadow-2xl disabled:opacity-30"
+      >
+        {disabled ? (
+          <><Zap className="w-3.5 h-3.5 mr-2 animate-pulse" /> EXECUTING...</>
+        ) : (
+          <><Sparkles className="w-3.5 h-3.5 mr-2" /> APPLY TRANSFORMATIONS</>
+        )}
+      </Button>
     </div>
   );
 };

@@ -1,6 +1,10 @@
-# React + Vite + shadcn/ui Starter Template
+# Dala - Enhancer
 
-A modern React starter template built with Vite, TypeScript, Tailwind CSS, and shadcn/ui components.
+Dala Enhancer Pro is a developer-focused transformation platform that upgrades raw web projects into production-ready applications. It accepts real project inputs via ZIP upload or GitHub repositories, performs deep static code analysis, and generates a structured improvement plan based on actual project data.
+
+Once approved by the user, it applies real code-level enhancements such as authentication systems, payment integrations (Chapa), dashboard modules, and architectural improvements. The system then exports a fully upgraded and deployable project package.
+
+The platform is designed to bridge the gap between early-stage generated projects and production-grade software by introducing a structured analysis, planning, and transformation pipeline.
 
 ## 🚀 Features
 

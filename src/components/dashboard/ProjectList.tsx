@@ -1,89 +1,97 @@
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Plus, Search, Filter, MoreVertical, CheckCircle2, Clock } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { Search, Filter, Plus, Clock, CheckCircle2, AlertCircle, FileText, ChevronRight } from "lucide-react";
 
 interface ProjectListProps {
   onNewProject: () => void;
 }
 
 export const ProjectList: React.FC<ProjectListProps> = ({ onNewProject }) => {
+  const [search, setSearch] = useState("");
+
   const projects = [
-    { id: 1, name: "E-commerce Starter", date: "2 days ago", status: "enhanced", type: "Store" },
-    { id: 2, name: "My Personal Portfolio", date: "1 week ago", status: "enhanced", type: "Portfolio" },
-    { id: 3, name: "Donation App V2", date: "Jan 12, 2024", status: "processed", type: "Non-profit" },
-    { id: 4, name: "SaaS Dashboard", date: "Dec 20, 2023", status: "enhanced", type: "SaaS" },
+    { id: "1", name: "COMMERCE-ALPHA", status: "enhanced", type: "E-commerce", date: "2H AGO", score: 98 },
+    { id: "2", name: "DONATE-X", status: "analyzed", type: "Donation", date: "5H AGO", score: 72 },
+    { id: "3", name: "SCHEDULER-V1", status: "enhanced", type: "Booking", date: "1D AGO", score: 94 },
+    { id: "4", name: "PORTFOLIO-PREMIUM", status: "analyzed", type: "Elite Portfolio", date: "3D AGO", score: 65 },
   ];
 
-  const thumbnails = "https://storage.googleapis.com/dala-prod-public-storage/generated-images/c4c7b4b0-c18f-43f1-92e0-8914e043ced2/project-thumbnails-a9960d71-1776172386565.webp";
-
   return (
-    <div className="space-y-8">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="space-y-10">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-8">
         <div>
-          <h1 className="text-4xl font-black mb-2">My Projects</h1>
-          <p className="text-slate-400">Manage and re-enhance your Dala projects.</p>
+          <h1 className="text-4xl font-normal tracking-tight text-white">Project Registry</h1>
+          <p className="text-zinc-500 text-sm tracking-widest mt-2 font-normal uppercase">Centralized architectural asset management</p>
         </div>
         <Button 
           onClick={onNewProject}
-          className="bg-indigo-600 hover:bg-indigo-500 h-12 px-6"
+          className="bg-white text-black hover:bg-zinc-200 rounded-none h-12 px-10 text-xs font-normal tracking-widest shadow-2xl"
         >
-          <Plus className="w-5 h-5 mr-2" /> New Enhancement
+          <Plus className="w-3.5 h-3.5 mr-2" /> NEW PROJECT
         </Button>
       </div>
 
-      <div className="flex items-center gap-4 py-4 border-y border-slate-800">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+      <div className="flex gap-4 p-5 border border-zinc-900 bg-zinc-950/50">
+        <div className="relative flex-grow">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-600" />
           <input 
             type="text" 
-            placeholder="Search projects..." 
-            className="w-full bg-slate-900 border border-slate-700 rounded-lg pl-10 h-10 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+            placeholder="SEARCH REGISTRY..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full bg-black border border-zinc-900 h-12 pl-12 pr-4 text-xs tracking-widest text-white focus:outline-none focus:border-zinc-700 transition-colors font-normal"
           />
         </div>
-        <Button variant="outline" className="border-slate-700 text-slate-400">
-          <Filter className="w-4 h-4 mr-2" /> Filter
+        <Button variant="outline" className="border-zinc-900 h-12 px-5 rounded-none text-zinc-500 hover:text-white font-normal">
+          <Filter className="w-4 h-4" />
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {projects.map((project, i) => (
+      <div className="grid grid-cols-1 gap-5">
+        {projects.map((project, idx) => (
           <motion.div
             key={project.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.1 }}
-            className="group bg-slate-900 border border-white/5 rounded-2xl overflow-hidden hover:border-indigo-500/30 transition-all hover:shadow-xl hover:shadow-indigo-500/5"
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: idx * 0.05 }}
+            className="group relative bg-black border border-zinc-900 p-6 flex flex-col md:flex-row items-center justify-between gap-8 hover:border-zinc-700 transition-all"
           >
-            <div className="aspect-video relative overflow-hidden">
-               <img src={thumbnails} alt={project.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-               <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 to-transparent" />
-               <Badge className={`absolute top-4 right-4 ${
-                 project.status === "enhanced" ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30" : "bg-indigo-500/20 text-indigo-400 border-indigo-500/30"
-               }`}>
-                 {project.status === "enhanced" ? <CheckCircle2 className="w-3 h-3 mr-1" /> : <Clock className="w-3 h-3 mr-1" />}
-                 {project.status}
-               </Badge>
-            </div>
-            <div className="p-6">
-              <div className="flex items-start justify-between mb-4">
-                <div>
-                  <h3 className="font-bold text-lg leading-tight mb-1">{project.name}</h3>
-                  <p className="text-slate-500 text-xs">{project.type} • {project.date}</p>
+            <div className="flex items-center gap-8 w-full md:w-auto">
+              <div className="w-14 h-14 border border-zinc-900 flex items-center justify-center shrink-0 group-hover:border-zinc-700 transition-colors">
+                <FileText className="w-6 h-6 text-zinc-700 group-hover:text-white" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-lg font-normal text-white tracking-wider">{project.name}</h3>
+                <div className="flex items-center gap-5">
+                  <span className="text-xs text-zinc-600 tracking-widest font-normal uppercase">{project.type}</span>
+                  <div className="w-1 h-1 bg-zinc-800" />
+                  <span className="text-xs text-zinc-600 tracking-widest flex items-center gap-2 font-normal uppercase">
+                    <Clock className="w-3.5 h-3.5" /> {project.date}
+                  </span>
                 </div>
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500">
-                  <MoreVertical className="w-4 h-4" />
-                </Button>
               </div>
-              <div className="flex items-center gap-2">
-                <Button className="flex-1 bg-slate-800 hover:bg-slate-700 text-sm h-9">
-                  Open Project
-                </Button>
-                <Button variant="outline" className="flex-1 border-slate-700 hover:bg-indigo-500/10 hover:text-indigo-400 text-sm h-9">
-                  Re-enhance
-                </Button>
+            </div>
+
+            <div className="flex items-center gap-10 w-full md:w-auto justify-between md:justify-end">
+              <div className="flex items-center gap-8">
+                <div className="text-right">
+                  <div className="text-[10px] text-zinc-600 tracking-widest mb-1 font-normal uppercase">Arch Score</div>
+                  <div className="text-2xl font-normal text-white">{project.score}%</div>
+                </div>
+                <div className="flex items-center gap-2 px-4 py-2 border border-zinc-900">
+                  {project.status === 'enhanced' ? (
+                    <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                  ) : (
+                    <AlertCircle className="w-4 h-4 text-amber-500" />
+                  )}
+                  <span className="text-xs text-white tracking-widest font-normal uppercase">{project.status}</span>
+                </div>
               </div>
+              
+              <button className="p-3 text-zinc-800 hover:text-white transition-colors">
+                <ChevronRight className="w-6 h-6" />
+              </button>
             </div>
           </motion.div>
         ))}

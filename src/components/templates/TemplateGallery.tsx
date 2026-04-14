@@ -1,86 +1,64 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { ShoppingBag, Heart, Calendar, User, Layout, ArrowRight } from "lucide-react";
+import { Check, ArrowRight } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export const TemplateGallery: React.FC = () => {
   const templates = [
     {
       title: "E-commerce Starter",
-      desc: "Product pages, cart UI, and secure checkout flow.",
-      icon: ShoppingBag,
-      color: "from-pink-500 to-rose-500",
-      features: ["Product Grid", "Cart System", "Stripe Ready"]
+      desc: "Modern storefront with product listings, checkout logic, and payment integration.",
+      features: ["Product Engine", "Cart Logic", "Payment Flow", "Inventory Sync"]
     },
     {
       title: "Donation Platform",
-      desc: "Progress bars, donor lists, and contribution forms.",
-      icon: Heart,
-      color: "from-emerald-500 to-teal-500",
-      features: ["Goal Tracking", "Recent Donors", "Impact Reports"]
+      desc: "Secure global contribution system with real-time tracking and multi-currency support.",
+      features: ["Goal Tracking", "Transaction Verifier", "Impact Dashboard", "Tax Receipts"]
     },
     {
       title: "Booking System",
-      desc: "Clean calendar UI and request management forms.",
-      icon: Calendar,
-      color: "from-blue-500 to-indigo-500",
-      features: ["Date Picker", "Admin Panel", "Email Sync"]
-    },
-    {
-      title: "Portfolio Site",
-      desc: "Elegant personal site layouts for creatives.",
-      icon: User,
-      color: "from-amber-500 to-orange-500",
-      features: ["Project Gallery", "Contact Form", "Blog Setup"]
-    },
-    {
-      title: "Landing Page Gen",
-      desc: "High-converting hero sections and CTA components.",
-      icon: Layout,
-      color: "from-purple-500 to-indigo-600",
-      features: ["A/B Testing UI", "Lead Capture", "Feature Cards"]
+      desc: "Enterprise resource management with calendar integration and automated notifications.",
+      features: ["Date Parser", "Client Terminal", "Notification Engine", "Sync Flow"]
     }
   ];
 
   return (
-    <div className="space-y-12">
-      <div className="text-center">
-        <h2 className="text-4xl font-black mb-4">Extra Templates & Add-ons</h2>
-        <p className="text-slate-400 max-w-2xl mx-auto">
-          Need a head start? Use our prebuilt templates and add-ons to build specialized 
-          applications on top of your Dala projects.
-        </p>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    <div className="">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
         {templates.map((template, i) => (
           <motion.div
             key={i}
-            whileHover={{ y: -8 }}
-            className="group bg-slate-900 border border-white/5 rounded-3xl p-8 hover:border-indigo-500/30 transition-all relative overflow-hidden"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className={cn(
+              "group relative bg-black border border-zinc-900 rounded-none p-10 transition-all duration-500",
+              "hover:border-zinc-700"
+            )}
           >
-            <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${template.color} opacity-[0.03] rounded-bl-full group-hover:opacity-10 transition-opacity`} />
+            <h3 className="text-xl font-normal mb-4 text-white tracking-tight">
+              {template.title}
+            </h3>
             
-            <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${template.color} flex items-center justify-center mb-8 shadow-lg group-hover:scale-110 transition-transform`}>
-              <template.icon className="w-7 h-7 text-white" />
-            </div>
-
-            <h3 className="text-2xl font-bold mb-4">{template.title}</h3>
-            <p className="text-slate-400 text-sm mb-8 leading-relaxed">
+            <p className="text-zinc-500 text-sm mb-10 leading-relaxed font-normal">
               {template.desc}
             </p>
 
-            <ul className="space-y-3 mb-8">
+            <ul className="space-y-4 mb-12">
               {template.features.map((feat, j) => (
-                <li key={j} className="flex items-center text-xs text-slate-300">
-                  <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 mr-2" />
+                <li key={j} className="flex items-center text-xs text-zinc-400 font-normal">
+                  <Check className="w-3.5 h-3.5 text-zinc-700 mr-4" />
                   {feat}
                 </li>
               ))}
             </ul>
 
-            <Button variant="link" className="p-0 text-indigo-400 hover:text-indigo-300 font-bold group-hover:gap-2 transition-all">
-              Preview Template <ArrowRight className="w-4 h-4" />
+            <Button 
+              variant="outline" 
+              className="w-full border-zinc-900 hover:border-zinc-700 hover:bg-white hover:text-black rounded-none h-12 text-xs font-normal tracking-widest transition-all duration-300"
+            >
+              PREVIEW <ArrowRight className="w-3.5 h-3.5 ml-2" />
             </Button>
           </motion.div>
         ))}

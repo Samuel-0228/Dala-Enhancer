@@ -1,79 +1,91 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { motion } from "framer-motion";
-import { Search, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { Shield, Layout, Search, Code, Cpu } from "lucide-react";
+import { AnalysisResult } from "@/lib/types";
 
-export const AnalysisEngine: React.FC = () => {
-  const [scannedFiles, setScannedFiles] = useState(0);
-  const totalFiles = 42;
+interface AnalysisEngineProps {
+  result: AnalysisResult | null;
+}
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setScannedFiles(prev => {
-        if (prev >= totalFiles) {
-          clearInterval(interval);
-          return totalFiles;
-        }
-        return prev + 1;
-      });
-    }, 50);
-    return () => clearInterval(interval);
-  }, []);
-
-  const improvements = [
-    { title: "UI/UX System", status: "missing", desc: "Basic styling detected, missing modern design system." },
-    { title: "Authentication", status: "missing", desc: "No login/signup flow found." },
-    { title: "Dashboard", status: "missing", desc: "Missing administrative interface." },
-    { title: "Responsive Design", status: "partial", desc: "Limited mobile responsiveness." },
-    { title: "Performance", status: "missing", desc: "Missing code splitting and lazy loading." },
+export const AnalysisEngine: React.FC<AnalysisEngineProps> = ({ result }) => {
+  const categories = [
+    { name: "Framework", score: result?.score || 0, icon: Layout, details: result?.framework || "Analyzing..." },
+    { name: "Backend", score: result?.hasBackend ? 100 : 0, icon: Shield, details: result?.hasBackend ? "Detected" : "Not Found" },
+    { name: "Structure", score: result?.structureValid ? 100 : 0, icon: Search, details: result?.structureValid ? "Valid" : "Issues Found" },
+    { name: "Components", score: 100, icon: Code, details: `${result?.stats.components || 0} units` },
   ];
 
   return (
-    <div className="p-8 bg-slate-900 border border-white/10 rounded-3xl">
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h2 className="text-2xl font-bold mb-2 flex items-center">
-            <Search className="w-6 h-6 mr-3 text-indigo-400" />
-            Analyzing Project Structure
-          </h2>
-          <p className="text-slate-400">Scanning for missing features and optimization opportunities.</p>
-        </div>
-        <div className="text-right">
-          <div className="text-2xl font-mono font-bold text-indigo-400">{scannedFiles}/{totalFiles}</div>
-          <div className="text-xs text-slate-500">Files Analyzed</div>
-        </div>
+    <div className="space-y-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {categories.map((cat, i) => (
+          <Card key={i} className="bg-black border-zinc-900 rounded-none p-6 relative overflow-hidden group hover:border-zinc-700 transition-all">
+            <div className="relative z-10">
+              <div className="flex items-center justify-between mb-5">
+                <cat.icon className="w-5 h-5 text-zinc-600 group-hover:text-white transition-colors" />
+                <span className="text-xl font-normal text-white">{cat.score}%</span>
+              </div>
+              <h3 className="text-xs font-normal tracking-widest text-zinc-500 mb-1">{cat.name.toUpperCase()}</h3>
+              <div className="text-[10px] text-zinc-700 tracking-tight leading-tight mb-5">{cat.details}</div>
+              <Progress value={cat.score} className="h-1 bg-zinc-950" />
+            </div>
+          </Card>
+        ))}
       </div>
 
-      <div className="space-y-4">
-        {improvements.map((item, i) => (
-          <motion.div
-            key={i}
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: i * 0.2 }}
-            className="p-5 bg-slate-800/50 rounded-2xl border border-white/5 flex items-start gap-4"
-          >
-            <div className="mt-1">
-              {item.status === "missing" ? (
-                <AlertCircle className="w-5 h-5 text-amber-500" />
-              ) : item.status === "partial" ? (
-                <Loader2 className="w-5 h-5 text-indigo-400 animate-spin" />
-              ) : (
-                <CheckCircle2 className="w-5 h-5 text-emerald-500" />
-              )}
-            </div>
-            <div className="flex-1">
-              <div className="flex items-center justify-between mb-1">
-                <h4 className="font-bold">{item.title}</h4>
-                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${
-                  item.status === "missing" ? "bg-amber-500/10 text-amber-500" : "bg-indigo-500/10 text-indigo-400"
-                }`}>
-                  {item.status}
-                </span>
+      <div className="bg-black border border-zinc-900 p-10 rounded-none relative overflow-hidden">
+        <div className="absolute top-0 right-0 p-10 opacity-[0.02] pointer-events-none">
+          <Cpu className="w-64 h-64" />
+        </div>
+        
+        <div className="flex flex-col md:flex-row gap-16 items-center">
+          <div className="relative flex-shrink-0">
+            <div className="w-56 h-56 border border-zinc-900 flex items-center justify-center rounded-none group">
+              <div className="text-center">
+                <div className="text-xs text-zinc-600 tracking-widest mb-2 uppercase">Core Score</div>
+                <div className="text-6xl font-normal text-white tracking-tighter">{result?.score || 0}</div>
               </div>
-              <p className="text-slate-400 text-sm">{item.desc}</p>
+              <div className="absolute inset-0 border-t border-white/10 animate-[spin_10s_linear_infinite] rounded-full scale-110"></div>
             </div>
-          </motion.div>
-        ))}
+          </div>
+
+          <div className="flex-grow space-y-10 w-full">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-12">
+              <div className="space-y-5">
+                <h4 className="text-xs font-normal text-white tracking-[0.2em] flex items-center gap-2 uppercase">
+                  <Search className="w-4 h-4" /> Detected Issues
+                </h4>
+                <div className="space-y-3">
+                  {result?.issues.map((issue, i) => (
+                    <div key={i} className="flex items-center justify-between p-4 border border-zinc-950 bg-zinc-950/30 text-[10px] tracking-widest text-zinc-500">
+                      <span>{issue.type.toUpperCase()}</span>
+                      <span className={issue.severity === 'high' ? 'text-red-500' : 'text-amber-500'}>{issue.severity.toUpperCase()}</span>
+                    </div>
+                  ))}
+                  {(!result || result.issues.length === 0) && (
+                    <div className="p-4 border border-zinc-950 text-[10px] tracking-widest text-zinc-800 uppercase">No critical issues detected</div>
+                  )}
+                </div>
+              </div>
+
+              <div className="space-y-5">
+                <h4 className="text-xs font-normal text-white tracking-[0.2em] flex items-center gap-2 uppercase">
+                  <Code className="w-4 h-4" /> Suggestions
+                </h4>
+                <div className="space-y-3">
+                  {result?.suggestions.map((sug, i) => (
+                    <div key={i} className="flex items-center justify-between p-4 border border-zinc-950 bg-zinc-950/30 text-[10px] tracking-widest text-zinc-500">
+                      <span className="truncate max-w-[150px]">{sug}</span>
+                      <span className="text-white">STABLE</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
