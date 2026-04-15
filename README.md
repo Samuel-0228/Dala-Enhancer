@@ -101,4 +101,4 @@ Feel free to submit issues and enhancement requests!
 
 ---
 
-Built for Dala ambassadors competition by the Dala team to help developers build faster and smarter.
+Built for Dala ambassadors competition.
