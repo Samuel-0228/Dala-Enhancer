@@ -3,42 +3,40 @@ import { ProjectFile, EnhancementPlan } from './types';
 export function applyPlan(files: ProjectFile[], plan: EnhancementPlan, approvals: string[]): ProjectFile[] {
   const newFiles = [...files.map(f => ({ ...f }))];
   
-  const allDependencies: Record<string, string> = {};
+  const allDependencies: Record<string, string> = {
+    "lucide-react": "latest",
+    "clsx": "latest",
+    "tailwind-merge": "latest"
+  };
 
   for (const step of plan.steps) {
     if (!approvals.includes(step.id)) continue;
 
-    // Collect dependencies
     if (step.dependencies) {
       Object.assign(allDependencies, step.dependencies);
     }
 
-    // Create new files
     if (step.files_to_create) {
       step.files_to_create.forEach(f => {
         addOrReplaceFile(newFiles, f.path, f.template);
       });
     }
 
-    // Modify existing files
     if (step.files_to_modify) {
       step.files_to_modify.forEach(m => {
         const file = newFiles.find(f => f.path.endsWith(m.path));
         if (!file) return;
 
         if (m.type === 'css_append') {
-          file.content += `
-
-/* Dala Enhancer Pro: Design Refactor */
-:root {
-  --accent: #ffffff;
-  --background: #000000;
-  --foreground: #ffffff;
-}
-`;
-        } else if (m.type === 'route_injection' && file.path.endsWith('App.tsx')) {
+          if (!file.content.includes('Dala Enhancer Pro')) {
+            file.content += "\
+\
+/* Dala Enhancer Pro */\
+:root { --primary-dala: #ffffff; }";
+          }
+        } else if (m.type === 'route_injection') {
           file.content = injectRoute(file.content, step.name);
-        } else if (m.type === 'package_json' && file.path.endsWith('package.json')) {
+        } else if (m.type === 'package_json') {
           file.content = updatePackageJson(file.content, allDependencies);
         }
       });
@@ -58,33 +56,25 @@ function addOrReplaceFile(files: ProjectFile[], path: string, content: string) {
 }
 
 function injectRoute(content: string, featureName: string): string {
-  // Very basic route injection for React projects
-  // Looks for common patterns like <Routes> or Switch
   const isAuth = featureName.includes('Auth');
   const isDash = featureName.includes('Dashboard');
   
-  if (isAuth && !content.includes('Login')) {
-    const importMatch = content.match(/import.*from/);
-    if (importMatch) {
-      content = `import { AuthSystem as Login } from './pages/Login';
-` + content;
+  if (isAuth && !content.includes('AuthSystem')) {
+    content = "import { AuthSystem as Login } from './components/auth/AuthSystem';\
+" + content;
+    if (content.includes('<Routes>')) {
+      content = content.replace('<Routes>', '<Routes>\
+<Route path="/login" element={<Login />} />');
     }
-    content = content.replace(/<Routes>|<Switch>/, (match) => 
-      `${match}
-          <Route path="/login" element={<Login />} />`
-    );
   }
 
-  if (isDash && !content.includes('Dashboard')) {
-    const importMatch = content.match(/import.*from/);
-    if (importMatch) {
-      content = `import { DashboardOverview as Dashboard } from './pages/Dashboard';
-` + content;
+  if (isDash && !content.includes('DashboardOverview')) {
+    content = "import { DashboardOverview as Dashboard } from './pages/Dashboard';\
+" + content;
+    if (content.includes('<Routes>')) {
+      content = content.replace('<Routes>', '<Routes>\
+<Route path="/dashboard" element={<Dashboard />} />');
     }
-    content = content.replace(/<Routes>|<Switch>/, (match) => 
-      `${match}
-          <Route path="/dashboard" element={<Dashboard />} />`
-    );
   }
 
   return content;

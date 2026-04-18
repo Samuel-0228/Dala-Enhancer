@@ -36,26 +36,45 @@ export function analyzeProject(files: ProjectFile[]): AnalysisResult {
     }
   }
 
+  // Improved Feature Detection
   const hasAuth = files.some(f => 
     f.path.toLowerCase().includes('auth') || 
     f.path.toLowerCase().includes('login') || 
     f.path.toLowerCase().includes('signup') ||
     f.content.includes('firebase/auth') ||
     f.content.includes('@supabase/auth') ||
-    f.content.includes('next-auth')
+    f.content.includes('next-auth') ||
+    f.content.includes('@clerk/nextjs')
   );
 
   const hasPayments = files.some(f => 
     f.content.includes('chapa') || 
     f.content.includes('stripe') ||
-    f.path.toLowerCase().includes('payment')
+    f.content.includes('@stripe/stripe-js') ||
+    f.path.toLowerCase().includes('payment') ||
+    f.path.toLowerCase().includes('checkout')
   );
 
   const hasDashboard = files.some(f => 
     f.path.toLowerCase().includes('dashboard') || 
-    f.path.toLowerCase().includes('admin')
+    f.path.toLowerCase().includes('admin') ||
+    f.path.toLowerCase().includes('overview')
   );
 
+  const hasTailwind = files.some(f => 
+    f.content.includes('tailwind') || 
+    f.path.includes('tailwind.config') ||
+    f.path.includes('postcss.config')
+  );
+
+  const hasShadcn = files.some(f => 
+    f.path.includes('components/ui') ||
+    f.content.includes('lucide-react') && f.content.includes('clsx')
+  );
+
+  const hasTypescript = files.some(f => f.path.endsWith('.ts') || f.path.endsWith('.tsx'));
+
+  // Issues and Suggestions
   if (!hasAuth) {
     issues.push({ 
       type: 'missing_feature', 
@@ -63,7 +82,7 @@ export function analyzeProject(files: ProjectFile[]): AnalysisResult {
       suggestion: 'Implement Secure Authentication',
       severity: 'high' 
     });
-    suggestions.push('Add Login/Signup pages and Auth Context');
+    suggestions.push('Add Login/Signup pages and Auth Context for secure user sessions.');
   }
   
   if (!hasPayments) {
@@ -73,7 +92,7 @@ export function analyzeProject(files: ProjectFile[]): AnalysisResult {
       suggestion: 'Integrate Chapa Payments',
       severity: 'medium'
     });
-    suggestions.push('Add Chapa payment service and checkout workflow');
+    suggestions.push('Add Chapa payment service to enable local and international transactions.');
   }
   
   if (!hasDashboard) {
@@ -83,12 +102,9 @@ export function analyzeProject(files: ProjectFile[]): AnalysisResult {
       suggestion: 'Add Administration Dashboard',
       severity: 'medium'
     });
-    suggestions.push('Create an overview panel with business metrics');
+    suggestions.push('Create a centralized overview panel to monitor project metrics.');
   }
 
-  const hasTailwind = files.some(f => f.content.includes('tailwind') || f.path.includes('tailwind.config'));
-  const hasShadcn = files.some(f => f.path.includes('components/ui'));
-  
   if (!hasTailwind && !hasShadcn) {
     issues.push({ 
       type: 'ui', 
@@ -96,34 +112,40 @@ export function analyzeProject(files: ProjectFile[]): AnalysisResult {
       suggestion: 'Modernize with Tailwind & Shadcn',
       severity: 'medium' 
     });
+    suggestions.push('Adopt utility-first CSS and pre-built accessible components.');
+  }
+
+  if (!hasTypescript && stats.totalFiles > 10) {
+    issues.push({ 
+      type: 'performance', 
+      issue: 'Type Safety Risks', 
+      suggestion: 'Migrate to TypeScript',
+      severity: 'low'
+    });
+    suggestions.push('Improve codebase maintainability and prevent runtime errors.');
   }
 
   const hasLazy = files.some(f => f.content.includes('lazy(') || f.content.includes('dynamic('));
   if (!hasLazy && pageFiles.length > 3) {
     issues.push({ 
       type: 'performance', 
-      issue: 'Missing Code Splitting', 
-      suggestion: 'Implement React.lazy for routes',
+      issue: 'Suboptimal Loading', 
+      suggestion: 'Implement Code Splitting',
       severity: 'low'
     });
+    suggestions.push('Use React.lazy or Next.js dynamic imports to reduce initial bundle size.');
   }
 
-  if (stats.totalFiles > 5 && stats.components === 0) {
-    issues.push({ 
-      type: 'structure', 
-      issue: 'Flat File Structure', 
-      suggestion: 'Modularize into /components directory',
-      severity: 'medium'
-    });
-  }
-
+  // Scoring Logic
   let baseScore = 100;
   if (!hasAuth) baseScore -= 15;
-  if (!hasPayments) baseScore -= 10;
+  if (!hasPayments) baseScore -= 15;
   if (!hasDashboard) baseScore -= 10;
   if (!hasTailwind) baseScore -= 10;
+  if (!hasTypescript) baseScore -= 5;
   if (!hasLazy && pageFiles.length > 5) baseScore -= 5;
   if (framework === 'unknown') baseScore -= 20;
+  if (stats.totalFiles < 3) baseScore -= 10;
 
   return {
     framework,

@@ -3,12 +3,15 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Boxes } from "@/components/ui/background-boxes";
 import { Sparkles, Terminal } from "lucide-react";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface HeroProps {
   onStart: () => void;
 }
 
 export const Hero = ({ onStart }: HeroProps) => {
+  const { t } = useLanguage();
+
   return (
     <div className="relative min-h-[500px] h-[60vh] w-full overflow-hidden bg-black flex flex-col items-center justify-center rounded-none">
       <div className="absolute inset-0 w-full h-full bg-black z-20 [mask-image:radial-gradient(transparent,white)] pointer-events-none" />
@@ -26,7 +29,7 @@ export const Hero = ({ onStart }: HeroProps) => {
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
             <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
           </span>
-          <span className="text-xs font-normal tracking-[0.2em] text-white/50">V4.0.1 STABLE</span>
+          <span className="text-xs font-normal tracking-[0.2em] text-white/50">V4.0.1 {t('stable')}</span>
         </motion.div>
 
         <motion.h1
@@ -35,7 +38,7 @@ export const Hero = ({ onStart }: HeroProps) => {
           transition={{ duration: 0.6, delay: 0.1 }}
           className="text-5xl md:text-7xl lg:text-8xl font-normal text-white tracking-tight leading-[0.95] mb-8"
         >
-          Dala <br className="hidden sm:block" /> Enhancer
+          {t('hero.title')}
         </motion.h1>
 
         <motion.p
@@ -44,7 +47,7 @@ export const Hero = ({ onStart }: HeroProps) => {
           transition={{ duration: 0.6, delay: 0.2 }}
           className="text-zinc-500 text-sm font-normal max-w-xl mx-auto mb-12 leading-relaxed"
         >
-          Real-time architectural parsing, security auditing, and automated module injection for production codebases.
+          {t('hero.subtitle')}
         </motion.p>
 
         <motion.div
@@ -58,14 +61,14 @@ export const Hero = ({ onStart }: HeroProps) => {
             onClick={onStart}
             className="w-full sm:w-auto bg-white text-black hover:bg-zinc-200 h-12 px-12 rounded-none font-normal tracking-widest text-xs transition-all active:scale-95 group shadow-[0_0_30px_rgba(255,255,255,0.1)]"
           >
-            INITIALIZE <Sparkles className="w-3.5 h-3.5 ml-2 group-hover:rotate-12 transition-transform" />
+            {t('hero.initialize')} <Sparkles className="w-3.5 h-3.5 ml-2 group-hover:rotate-12 transition-transform" />
           </Button>
           <Button
             variant="outline"
             size="lg"
             className="w-full sm:w-auto border-zinc-800 text-zinc-500 hover:text-white hover:border-white h-12 px-12 rounded-none font-normal tracking-widest text-xs transition-all"
           >
-            TECHNICAL DOCS <Terminal className="w-3.5 h-3.5 ml-2" />
+            {t('hero.docs')} <Terminal className="w-3.5 h-3.5 ml-2" />
           </Button>
         </motion.div>
       </div>

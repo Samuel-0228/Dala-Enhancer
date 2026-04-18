@@ -1,6 +1,14 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Terminal, Menu, X, LayoutDashboard } from "lucide-react";
+import { Terminal, Menu, X, LayoutDashboard, Globe } from "lucide-react";
+import { useLanguage } from "@/context/LanguageContext";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Language } from "@/lib/types";
 
 interface NavbarProps {
   setView: (view: "landing" | "dashboard" | "enhancer") => void;
@@ -8,12 +16,19 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ setView, currentView }) => {
+  const { language, setLanguage, t } = useLanguage();
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
 
   const navLinks = [
-    { name: "HOME", view: "landing" as const },
-    { name: "PROJECTS", view: "dashboard" as const },
-    { name: "DOCS", view: "landing" as const },
+    { name: t('home'), view: "landing" as const },
+    { name: t('projects'), view: "dashboard" as const },
+    { name: t('docs'), view: "landing" as const },
+  ];
+
+  const languages = [
+    { code: 'en' as Language, name: 'English' },
+    { code: 'am' as Language, name: 'Amharic (አማርኛ)' },
+    { code: 'om' as Language, name: 'Afan Oromo' },
   ];
 
   return (
@@ -28,7 +43,7 @@ export const Navbar: React.FC<NavbarProps> = ({ setView, currentView }) => {
             <div className="absolute -top-[1px] -left-[1px] w-1 h-1 bg-white"></div>
           </div>
           <span className="text-xl font-normal tracking-tight text-white italic leading-none">
-            DALA ENHANCER
+            {t('dala.enhancer')}
           </span>
         </div>
 
@@ -49,16 +64,40 @@ export const Navbar: React.FC<NavbarProps> = ({ setView, currentView }) => {
           <button 
             className="text-zinc-500 hover:text-white transition-all flex items-center"
             onClick={() => setView("dashboard")}
-            title="Dashboard"
+            title={t('dashboard')}
           >
             <LayoutDashboard className="w-4 h-4" />
           </button>
+
+          {/* Language Switcher */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="text-zinc-500 hover:text-white transition-all flex items-center gap-2 text-xs tracking-widest">
+                <Globe className="w-4 h-4" />
+                <span className="uppercase">{language}</span>
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="bg-black border-zinc-900 text-white rounded-none">
+              {languages.map((lang) => (
+                <DropdownMenuItem 
+                  key={lang.code} 
+                  onClick={() => setLanguage(lang.code)}
+                  className={`text-xs tracking-widest cursor-pointer hover:bg-zinc-900 focus:bg-zinc-900 ${
+                    language === lang.code ? 'text-white bg-zinc-900' : 'text-zinc-500'
+                  }`}
+                >
+                  {lang.name}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
           <Button 
             size="sm"
             className="bg-white text-black hover:bg-zinc-200 rounded-none text-xs font-normal tracking-widest px-6 h-10 shadow-2xl"
             onClick={() => setView("enhancer")}
           >
-            GET STARTED
+            {t('get.started')}
           </Button>
         </div>
 
@@ -94,8 +133,23 @@ export const Navbar: React.FC<NavbarProps> = ({ setView, currentView }) => {
               setIsMenuOpen(false);
             }}
           >
-            <LayoutDashboard className="w-4 h-4" /> DASHBOARD
+            <LayoutDashboard className="w-4 h-4" /> {t('dashboard')}
           </button>
+
+          <div className="flex flex-wrap gap-4">
+            {languages.map((lang) => (
+              <button
+                key={lang.code}
+                onClick={() => setLanguage(lang.code)}
+                className={`text-[10px] tracking-widest transition-all ${
+                  language === lang.code ? 'text-white underline underline-offset-4' : 'text-zinc-500'
+                }`}
+              >
+                {lang.name.split(' (')[0]}
+              </button>
+            ))}
+          </div>
+
           <Button 
             className="w-full bg-white text-black hover:bg-zinc-200 rounded-none text-xs font-normal tracking-widest h-12 shadow-2xl"
             onClick={() => {
@@ -103,7 +157,7 @@ export const Navbar: React.FC<NavbarProps> = ({ setView, currentView }) => {
               setIsMenuOpen(false);
             }}
           >
-            GET STARTED
+            {t('get.started')}
           </Button>
         </div>
       )}

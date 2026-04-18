@@ -1,13 +1,16 @@
 import React from "react";
 import { Terminal, Shield, Cpu, Activity, Twitter, Github, Disc as Discord } from "lucide-react";
+import { useLanguage } from "@/context/LanguageContext";
 
 export const Footer: React.FC = () => {
+  const { t } = useLanguage();
+
   const links = [
-    { name: "SYSTEM", href: "#" },
-    { name: "MODULES", href: "#" },
-    { name: "PRICING", href: "#" },
-    { name: "REGISTRY", href: "#" },
-    { name: "ACCESS", href: "#" },
+    { name: t('footer.system'), href: "#" },
+    { name: t('footer.modules'), href: "#" },
+    { name: t('footer.pricing'), href: "#" },
+    { name: t('footer.registry'), href: "#" },
+    { name: t('footer.access'), href: "#" },
   ];
 
   return (
@@ -20,11 +23,11 @@ export const Footer: React.FC = () => {
                 <Terminal className="w-4 h-4 text-white" />
               </div>
               <span className="text-xl font-normal tracking-tight text-white uppercase italic">
-                DALA ENHANCER
+                {t('dala.enhancer')}
               </span>
             </div>
             <p className="text-zinc-600 text-sm uppercase tracking-widest leading-relaxed max-w-sm font-normal">
-              ENTERPRISE-GRADE ARCHITECTURAL ENHANCEMENT ENGINE FOR THE NEXT GENERATION OF DIGITAL ASSETS.
+              {t('footer.desc')}
             </p>
             <div className="flex gap-5">
               {[Shield, Cpu, Activity].map((Icon, i) => (
@@ -36,7 +39,7 @@ export const Footer: React.FC = () => {
           </div>
           
           <div className="col-span-1">
-            <h4 className="text-xs uppercase tracking-[0.2em] text-zinc-500 font-normal mb-8">PLATFORM</h4>
+            <h4 className="text-xs uppercase tracking-[0.2em] text-zinc-500 font-normal mb-8">{t('footer.platform')}</h4>
             <div className="flex flex-col gap-5">
               {links.map((link) => (
                 <a 
@@ -52,9 +55,9 @@ export const Footer: React.FC = () => {
           </div>
           
           <div className="col-span-1">
-            <h4 className="text-xs uppercase tracking-[0.2em] text-zinc-500 font-normal mb-8">SECURITY</h4>
+            <h4 className="text-xs uppercase tracking-[0.2em] text-zinc-500 font-normal mb-8">{t('footer.security')}</h4>
             <div className="flex flex-col gap-5">
-              {['PROTOCOL', 'ENCRYPTION', 'AUDITS', 'COMPLIANCE'].map((item) => (
+              {[t('footer.protocol'), t('footer.encryption'), t('footer.audits'), t('footer.compliance')].map((item) => (
                 <a key={item} href="#" className="text-xs text-zinc-800 hover:text-white transition-all uppercase tracking-widest font-normal">
                   {item}
                 </a>
@@ -65,7 +68,7 @@ export const Footer: React.FC = () => {
         
         <div className="pt-8 border-t border-zinc-900 flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="text-[10px] text-zinc-800 uppercase tracking-[0.3em] font-normal text-center md:text-left">
-            © 2024 DALA ENHANCER PRO • ALL PROTOCOLS VERIFIED
+            {t('footer.rights')}
           </div>
           <div className="flex items-center gap-8">
             {[

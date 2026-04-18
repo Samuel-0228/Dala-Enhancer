@@ -2,7 +2,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Shield, Layout, Search, Code, Cpu } from "lucide-react";
+import { Shield, Layout, Search, Code, Cpu, AlertCircle, CheckCircle2 } from "lucide-react";
 import { AnalysisResult } from "@/lib/types";
 
 interface AnalysisEngineProps {
@@ -55,13 +55,18 @@ export const AnalysisEngine: React.FC<AnalysisEngineProps> = ({ result }) => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-12">
               <div className="space-y-5">
                 <h4 className="text-xs font-normal text-white tracking-[0.2em] flex items-center gap-2 uppercase">
-                  <Search className="w-4 h-4" /> Detected Issues
+                  <AlertCircle className="w-4 h-4 text-zinc-500" /> Architectural Gaps
                 </h4>
                 <div className="space-y-3">
                   {result?.issues.map((issue, i) => (
-                    <div key={i} className="flex items-center justify-between p-4 border border-zinc-950 bg-zinc-950/30 text-[10px] tracking-widest text-zinc-500">
-                      <span>{issue.type.toUpperCase()}</span>
-                      <span className={issue.severity === 'high' ? 'text-red-500' : 'text-amber-500'}>{issue.severity.toUpperCase()}</span>
+                    <div key={i} className="group flex flex-col p-4 border border-zinc-900 bg-zinc-950/20 hover:bg-zinc-950 transition-colors">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-[9px] tracking-widest text-zinc-600 uppercase">{issue.type}</span>
+                        <span className={`text-[8px] px-1.5 py-0.5 border ${issue.severity === 'high' ? 'border-red-900 text-red-500' : 'border-zinc-800 text-zinc-500'} uppercase font-bold tracking-[0.2em]`}>
+                          {issue.severity}
+                        </span>
+                      </div>
+                      <span className="text-xs text-white/80 font-normal">{issue.suggestion}</span>
                     </div>
                   ))}
                   {(!result || result.issues.length === 0) && (
@@ -72,13 +77,13 @@ export const AnalysisEngine: React.FC<AnalysisEngineProps> = ({ result }) => {
 
               <div className="space-y-5">
                 <h4 className="text-xs font-normal text-white tracking-[0.2em] flex items-center gap-2 uppercase">
-                  <Code className="w-4 h-4" /> Suggestions
+                  <CheckCircle2 className="w-4 h-4 text-zinc-500" /> Strategic Suggestions
                 </h4>
                 <div className="space-y-3">
                   {result?.suggestions.map((sug, i) => (
-                    <div key={i} className="flex items-center justify-between p-4 border border-zinc-950 bg-zinc-950/30 text-[10px] tracking-widest text-zinc-500">
-                      <span className="truncate max-w-[150px]">{sug}</span>
-                      <span className="text-white">STABLE</span>
+                    <div key={i} className="p-4 border border-zinc-950 bg-zinc-950/30 flex items-start gap-3">
+                      <div className="w-1 h-1 bg-white mt-1.5 flex-shrink-0"></div>
+                      <span className="text-[10px] tracking-wide text-zinc-400 leading-relaxed">{sug}</span>
                     </div>
                   ))}
                 </div>

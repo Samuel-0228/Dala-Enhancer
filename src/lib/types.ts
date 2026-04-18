@@ -42,3 +42,5 @@ export interface EnhancementPlan {
 }
 
 export type ProjectStatus = "idle" | "uploading" | "analyzing" | "enhancing" | "ready";
+
+export type Language = 'en' | 'am' | 'om';

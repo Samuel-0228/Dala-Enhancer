@@ -1,9 +1,10 @@
-import React, { useState } from "react";
-import { Upload, Link as LinkIcon, Terminal } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Upload, Link as LinkIcon, Terminal, Loader2, Shield, Key } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { ProjectFile } from "@/lib/types";
+import { fetchGithubRepo } from "@/lib/github";
 import JSZip from "jszip";
 
 interface UploaderProps {
@@ -13,7 +14,17 @@ interface UploaderProps {
 export const Uploader: React.FC<UploaderProps> = ({ onComplete }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [gitUrl, setGitUrl] = useState("");
+  const [githubToken, setGithubToken] = useState("");
+  const [showTokenInput, setShowTokenInput] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+
+  // Load token from session storage if available
+  useEffect(() => {
+    const savedToken = sessionStorage.getItem("github_token");
+    if (savedToken) {
+      setGithubToken(savedToken);
+    }
+  }, []);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -45,6 +56,42 @@ export const Uploader: React.FC<UploaderProps> = ({ onComplete }) => {
     }
   };
 
+  const handleGithubConnect = async () => {
+    if (!gitUrl) {
+      toast.error("Source Missing: Please provide a valid GitHub repository URL.");
+      return;
+    }
+
+    if (!gitUrl.includes("github.com")) {
+      toast.error("Invalid Source: URL must be a valid GitHub repository.");
+      return;
+    }
+
+    setIsProcessing(true);
+    toast.info("Remote injection protocol initializing...");
+
+    try {
+      // Save token to session storage for convenience in current session
+      if (githubToken) {
+        sessionStorage.setItem("github_token", githubToken);
+      }
+
+      const { name, files } = await fetchGithubRepo(gitUrl, githubToken);
+      
+      if (files.length === 0) {
+        throw new Error("Empty Repository: No files detected in the source.");
+      }
+      
+      toast.success(`Connection established: ${files.length} units detected.`);
+      onComplete(name, files);
+    } catch (error: any) {
+      console.error("GitHub connection error:", error);
+      toast.error(error.message || "Connection failed: Verify repository accessibility.");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   return (
     <div className="space-y-8 font-normal">
       <div 
@@ -61,7 +108,11 @@ export const Uploader: React.FC<UploaderProps> = ({ onComplete }) => {
         <div className="max-w-md mx-auto space-y-10">
           <div className="w-20 h-20 border border-zinc-900 mx-auto flex items-center justify-center relative group">
             <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-            <Upload className={`w-8 h-8 ${isProcessing ? "animate-bounce text-white" : "text-zinc-800 group-hover:text-white transition-colors"}`} />
+            {isProcessing ? (
+               <Loader2 className="w-8 h-8 animate-spin text-white" />
+            ) : (
+               <Upload className="w-8 h-8 text-zinc-800 group-hover:text-white transition-colors" />
+            )}
           </div>
           
           <div className="space-y-4">
@@ -78,13 +129,18 @@ export const Uploader: React.FC<UploaderProps> = ({ onComplete }) => {
                 onChange={handleFileUpload}
                 className="absolute inset-0 opacity-0 cursor-pointer z-10"
                 accept=".zip"
+                disabled={isProcessing}
               />
               <Button className="w-full bg-white text-black hover:bg-zinc-200 h-12 rounded-none font-normal tracking-widest text-xs">
                 CHOOSE ZIP
               </Button>
             </div>
             <div className="hidden sm:flex items-center text-zinc-800 px-4 text-xs font-normal tracking-widest italic">OR</div>
-            <Button variant="outline" className="border-zinc-900 h-12 px-10 rounded-none text-zinc-500 hover:text-white text-xs tracking-widest font-normal">
+            <Button 
+              variant="outline" 
+              className="border-zinc-900 h-12 px-10 rounded-none text-zinc-500 hover:text-white text-xs tracking-widest font-normal"
+              disabled={isProcessing}
+            >
               BROWSE FILES
             </Button>
           </div>
@@ -92,32 +148,67 @@ export const Uploader: React.FC<UploaderProps> = ({ onComplete }) => {
       </div>
 
       <div className="bg-zinc-950 border border-zinc-900 p-10 rounded-none">
-        <div className="flex items-center gap-5 mb-10">
-          <div className="w-12 h-12 border border-zinc-900 flex items-center justify-center">
-            <Terminal className="w-5 h-5 text-zinc-700" />
+        <div className="flex items-center justify-between mb-10">
+          <div className="flex items-center gap-5">
+            <div className="w-12 h-12 border border-zinc-900 flex items-center justify-center">
+              <Terminal className="w-5 h-5 text-zinc-700" />
+            </div>
+            <div>
+              <h3 className="text-sm font-normal text-white tracking-widest">REMOTE SOURCE INJECTION</h3>
+              <p className="text-xs text-zinc-700 mt-1 font-normal">Link public or private repository for cloud analysis</p>
+            </div>
           </div>
-          <div>
-            <h3 className="text-sm font-normal text-white tracking-widest">REMOTE SOURCE INJECTION</h3>
-            <p className="text-xs text-zinc-700 mt-1 font-normal">Link public repository for cloud analysis</p>
-          </div>
+          
+          <Button 
+            variant="ghost" 
+            size="sm"
+            onClick={() => setShowTokenInput(!showTokenInput)}
+            className={`text-[10px] tracking-widest font-normal border rounded-none h-8 ${
+              githubToken ? "text-white border-white/20 bg-white/5" : "text-zinc-600 border-zinc-900"
+            }`}
+          >
+            {githubToken ? <Shield className="w-3 h-3 mr-2 text-white" /> : <Key className="w-3 h-3 mr-2" />}
+            {githubToken ? "TOKEN ACTIVE" : "AUTHENTICATE"}
+          </Button>
         </div>
 
-        <div className="flex gap-4">
-          <div className="relative flex-grow font-normal">
-            <LinkIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-800" />
-            <Input 
-              placeholder="GitHub Repo URL..."
-              value={gitUrl}
-              onChange={(e) => setGitUrl(e.target.value)}
-              className="bg-black border-zinc-900 h-12 pl-12 rounded-none text-sm tracking-wide focus-visible:ring-zinc-800 font-normal"
-            />
+        <div className="space-y-4">
+          {showTokenInput && (
+            <div className="relative animate-in slide-in-from-top-2 duration-300">
+              <Key className="absolute left-4 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-700" />
+              <Input 
+                type="password"
+                placeholder="GitHub Personal Access Token (PAT)..."
+                value={githubToken}
+                onChange={(e) => setGithubToken(e.target.value)}
+                disabled={isProcessing}
+                className="bg-black border-zinc-900 border-dashed h-10 pl-12 rounded-none text-xs tracking-wide focus-visible:ring-zinc-800 font-normal text-zinc-400"
+              />
+              <p className="text-[10px] text-zinc-800 mt-2 ml-1 tracking-tighter uppercase">
+                Required for private repositories. Tokens are stored only for this session.
+              </p>
+            </div>
+          )}
+
+          <div className="flex gap-4">
+            <div className="relative flex-grow font-normal">
+              <LinkIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-800" />
+              <Input 
+                placeholder="GitHub Repo URL... (e.g., https://github.com/owner/repo)"
+                value={gitUrl}
+                onChange={(e) => setGitUrl(e.target.value)}
+                disabled={isProcessing}
+                className="bg-black border-zinc-900 h-12 pl-12 rounded-none text-sm tracking-wide focus-visible:ring-zinc-800 font-normal"
+              />
+            </div>
+            <Button 
+              className="bg-zinc-900 text-white hover:bg-white hover:text-black h-12 px-10 rounded-none text-xs font-normal tracking-widest transition-all"
+              onClick={handleGithubConnect}
+              disabled={isProcessing}
+            >
+              {isProcessing ? <Loader2 className="w-4 h-4 animate-spin" /> : "CONNECT"}
+            </Button>
           </div>
-          <Button 
-            className="bg-zinc-900 text-white hover:bg-white hover:text-black h-12 px-10 rounded-none text-xs font-normal tracking-widest transition-all"
-            onClick={() => toast.info("Remote injection protocol initializing...")}
-          >
-            CONNECT
-          </Button>
         </div>
       </div>
     </div>

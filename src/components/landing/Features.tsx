@@ -2,45 +2,48 @@ import React from "react";
 import { motion } from "framer-motion";
 import { Code, Shield, TrendingUp } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-const features = [
-  {
-    title: "Optimize Code",
-    icon: Code,
-    description: "Intelligent code restructuring and automated performance hardening.",
-    bullets: [
-      "Dependency management",
-      "Redundant code removal",
-      "TypeScript conversion",
-      "Architecture audits"
-    ]
-  },
-  {
-    title: "Deploy Securely",
-    icon: Shield,
-    description: "Production-ready deployment configurations and security protocols.",
-    bullets: [
-      "Env variable management",
-      "Security header injection",
-      "Docker containerization",
-      "CI/CD pipeline generation"
-    ],
-    badges: ["SOC2 READY", "GDPR COMPLIANT"]
-  },
-  {
-    title: "Scale Effortlessly",
-    icon: TrendingUp,
-    description: "Advanced scaling strategies and real-time performance monitoring.",
-    bullets: [
-      "Lighthouse score optimization",
-      "Asset compression pipelines",
-      "Edge function integration",
-      "Database indexing audits"
-    ]
-  }
-];
+import { useLanguage } from "@/context/LanguageContext";
 
 export const Features: React.FC = () => {
+  const { t } = useLanguage();
+
+  const features = [
+    {
+      title: t('features.optimize.title'),
+      icon: Code,
+      description: t('features.optimize.desc'),
+      bullets: [
+        t('features.optimize.b1'),
+        t('features.optimize.b2'),
+        t('features.optimize.b3'),
+        t('features.optimize.b4')
+      ]
+    },
+    {
+      title: t('features.deploy.title'),
+      icon: Shield,
+      description: t('features.deploy.desc'),
+      bullets: [
+        t('features.deploy.b1'),
+        t('features.deploy.b2'),
+        t('features.deploy.b3'),
+        t('features.deploy.b4')
+      ],
+      badges: ["SOC2 READY", "GDPR COMPLIANT"]
+    },
+    {
+      title: t('features.scale.title'),
+      icon: TrendingUp,
+      description: t('features.scale.desc'),
+      bullets: [
+        t('features.scale.b1'),
+        t('features.scale.b2'),
+        t('features.scale.b3'),
+        t('features.scale.b4')
+      ]
+    }
+  ];
+
   return (
     <section className="py-24 bg-black relative overflow-hidden">
       <div className="container mx-auto px-4 relative z-10">
@@ -91,7 +94,7 @@ export const Features: React.FC = () => {
 
               <div className="mt-auto pt-6 border-t border-zinc-900">
                 <button className="text-[10px] tracking-widest text-zinc-700 hover:text-white transition-colors font-normal flex items-center gap-2">
-                  LEARN MORE
+                  {t('learn.more')}
                   <div className="w-6 h-[1px] bg-zinc-900 group-hover:bg-white transition-all" />
                 </button>
               </div>

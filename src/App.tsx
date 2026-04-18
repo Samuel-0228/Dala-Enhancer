@@ -21,8 +21,10 @@ import { generatePlan } from "@/lib/enhancement";
 import { applyPlan } from "@/lib/transformer";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
+import { LanguageProvider, useLanguage } from "@/context/LanguageContext";
 
-function App() {
+function AppContent() {
+  const { t } = useLanguage();
   const [view, setView] = useState<"landing" | "dashboard" | "enhancer">("landing");
   const [status, setStatus] = useState<ProjectStatus>("idle");
   const [projectName, setProjectName] = useState<string>("");
@@ -56,10 +58,10 @@ function App() {
       setApprovals(generatedPlan.steps.map(s => s.id));
       
       setStatus("enhancing");
-      toast.success(`Analysis sequence complete. Core Score: ${result.score}%`);
+      toast.success(`${t('analysis.complete')} ${result.score}%`);
     } catch (error) {
       console.error("Analysis failed", error);
-      toast.error("Architectural parsing failed. File structure may be corrupt.");
+      toast.error(t('analysis.fail'));
       setStatus("idle");
     }
   };
@@ -74,7 +76,7 @@ function App() {
     if (!plan) return;
     
     setStatus("enhancing");
-    toast.info("Executing architectural transformation...", {
+    toast.info(t('executing.transform'), {
       duration: 2000,
     });
 
@@ -87,10 +89,10 @@ function App() {
         setModifiedFiles(transformed);
         setFinalAnalysis(finalResult);
         setStatus("ready");
-        toast.success("Enhancement protocols deployed successfully.");
+        toast.success(t('transform.success'));
       } catch (error) {
         console.error("Transformation failed", error);
-        toast.error("Code injection sequence failed.");
+        toast.error(t('transform.fail'));
       }
     }, 1500);
   };
@@ -105,7 +107,7 @@ function App() {
 
     const content = await zip.generateAsync({ type: "blob" });
     saveAs(content, `dala-enhanced-${projectName || 'project'}.zip`);
-    toast.success("Enhanced project archive exported.");
+    toast.success(t('archive.exported'));
   };
 
   const resetEnhancer = () => {
@@ -139,8 +141,8 @@ function App() {
               <Features />
               <div className="mt-16 pb-20">
                 <div className="text-center mb-12">
-                  <h2 className="text-3xl font-normal tracking-tight mb-2">Starter Templates</h2>
-                  <p className="text-zinc-500 max-w-xl mx-auto text-sm font-normal">Choose a base to begin your journey with Dala Enhancer</p>
+                  <h2 className="text-3xl font-normal tracking-tight mb-2">{t('starter.templates')}</h2>
+                  <p className="text-zinc-500 max-w-xl mx-auto text-sm font-normal">{t('starter.desc')}</p>
                 </div>
                 <TemplateGallery />
               </div>
@@ -181,15 +183,15 @@ function App() {
                   </Button>
                   <div>
                     <h1 className="text-2xl font-normal tracking-tight text-white leading-none">
-                      {projectName ? projectName : "Enhancer Terminal"}
+                      {projectName ? projectName : t('enhancer.terminal')}
                     </h1>
                     <div className="flex items-center gap-3 mt-2">
                       <p className="text-xs tracking-widest text-zinc-500 font-normal">
-                        Status: <span className="text-white animate-pulse">{status}</span>
+                        {t('status')}: <span className="text-white animate-pulse">{status}</span>
                       </p>
                       <div className="h-1 w-1 bg-zinc-800" />
                       <p className="text-xs tracking-widest text-zinc-500 font-normal">
-                        Buffer: <span className="text-white">{originalFiles.length} Units</span>
+                        {t('buffer')}: <span className="text-white">{originalFiles.length} {t('units')}</span>
                       </p>
                     </div>
                   </div>
@@ -197,7 +199,7 @@ function App() {
                 
                 {(status === "ready" || status === "enhancing") && (
                   <Button variant="outline" onClick={resetEnhancer} className="border-zinc-900 text-zinc-500 hover:bg-white hover:text-black rounded-none text-xs font-normal tracking-widest h-11 px-6">
-                    <Sparkles className="w-3.5 h-3.5 mr-2" /> Purge Workspace
+                    <Sparkles className="w-3.5 h-3.5 mr-2" /> {t('purge.workspace')}
                   </Button>
                 )}
               </div>
@@ -244,20 +246,20 @@ function App() {
                     >
                       <div className="absolute top-0 right-0 w-16 h-16 bg-black/5 -rotate-45 translate-x-8 -translate-y-8"></div>
                       <h3 className="text-xl font-normal mb-2 flex items-center tracking-tight">
-                        <CheckCircle2 className="w-5 h-5 mr-2" /> Export Unit
+                        <CheckCircle2 className="w-5 h-5 mr-2" /> {t('export.unit')}
                       </h3>
                       <p className="text-black/60 text-xs font-normal mb-6 leading-relaxed">
-                        Architectural refactoring finalized. Production-ready codebase compiled.
+                        {t('export.desc')}
                       </p>
                       <div className="space-y-3">
                         <Button 
                           onClick={handleDownloadZip}
                           className="w-full bg-black text-white hover:bg-zinc-900 h-11 rounded-none font-normal text-xs tracking-widest"
                         >
-                          <Download className="w-3.5 h-3.5 mr-2" /> Download ZIP
+                          <Download className="w-3.5 h-3.5 mr-2" /> {t('download.zip')}
                         </Button>
                         <Button variant="outline" className="w-full border-black/10 hover:bg-black hover:text-white h-11 rounded-none text-black/40 text-xs tracking-widest font-normal">
-                          <ExternalLink className="w-3.5 h-3.5 mr-2" /> GitHub Push
+                          <ExternalLink className="w-3.5 h-3.5 mr-2" /> {t('github.push')}
                         </Button>
                       </div>
                     </motion.div>
@@ -273,11 +275,19 @@ function App() {
       {view !== "landing" && (
         <footer className="mt-12 py-8 border-t border-zinc-950 bg-black">
           <div className="container mx-auto px-4 text-center text-zinc-800 text-xs tracking-widest font-normal">
-            <p>DALA ENHANCER PRO \\ ARCHITECTURAL SUPREMACY \\ 2024</p>
+            <p>{t('dala.enhancer')} PRO \\\\ ARCHITECTURAL SUPREMACY \\\\ 2024</p>
           </div>
         </footer>
       )}
     </div>
+  );
+}
+
+function App() {
+  return (
+    <LanguageProvider>
+      <AppContent />
+    </LanguageProvider>
   );
 }
 
