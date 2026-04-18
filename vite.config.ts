@@ -21,6 +21,9 @@ export default defineConfig({
     port: 3000,
     host: true,
     allowedHosts: true,
+    proxy: {
+      "/api": "http://127.0.0.1:4000",
+    },
   },
   preview: {
     port: 3000,

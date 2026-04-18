@@ -14,6 +14,7 @@ The platform is designed to bridge the gap between early-stage generated project
 - 🎨 **Tailwind CSS** - Utility-first CSS framework
 - 🧩 **shadcn/ui** - Beautifully designed components built with Radix UI
 - 📦 **Path Mapping** - Clean imports with `@/` prefix
+- 🔌 **Real backend API** - ZIP upload, GitHub clone, and static analysis endpoints
 
 ## 📦 Included shadcn/ui Components
 
@@ -39,16 +40,39 @@ The platform is designed to bridge the gap between early-stage generated project
    npm run dev
    ```
 
-3. **Build for production**
+3. **Start the backend API**
+
+   ```bash
+   npm run dev:backend
+   ```
+
+   Or run both frontend and backend together:
+
+   ```bash
+   npm run dev:full
+   ```
+
+4. **Build for production**
 
    ```bash
    npm run build
    ```
 
-4. **Preview production build**
+5. **Preview production build**
    ```bash
    npm run preview
    ```
+
+## 🔧 Backend API
+
+The backend listens on port `4000` and exposes these real endpoints:
+
+- `POST /api/upload-zip` - multipart ZIP upload using `file`, `zip`, or `archive`
+- `POST /api/analyze-zip` - analyze an extracted project by `projectId`
+- `POST /api/analyze-github` - clone and analyze a public GitHub repository by `repoUrl`
+- `GET /api/health` - health check
+
+During local development, Vite proxies `/api` requests to the backend server.
 
 ## 📁 Project Structure
 
